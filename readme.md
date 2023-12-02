@@ -79,3 +79,24 @@ any Pokemon. Because of this, if you encounter groups
 have been reorganised for whatever reason, this script
 will not work for you without either modifying your
 project structure or the script itself.
+
+### Credits
+
+* [PokeEmerald-Expansion Project](https://github.com/rh-hideout/pokeemerald-expansion), for creating the data used in `species.py`
+
+* [Pret's PokeEmerald Project](https://github.com/pret/pokeemerald), for making this work possible in the first place
+
+### Future Changes
+A list of future planned changes are listed below.
+
+| Change Description | Priority |
+| ------------------ | -------- | 
+| No planned changes | -        |
+
+### Problems or improvements
+If you have any suggested fixes or improvements for this project, please 
+feel free to open an issue [here](../../issues).
+
+### Sponsor Me
+If you would like to sponsor this project, please feel free to 
+make a donation [here](https://www.paypal.com/paypalme/sirsc).
