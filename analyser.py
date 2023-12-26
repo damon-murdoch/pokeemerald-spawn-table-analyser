@@ -7,15 +7,27 @@ import json as JSON
 # Species Table Data
 from species import SPECIES as species
 
+# Config file
+import config as CONFIG
+
 if __name__ == '__main__':
+
+    # No output methods specified in config
+    if CONFIG.OUTPUT_CSV == CONFIG.OUTPUT_MD == None:
+        print(f"Error: Please ensure at least one of OUTPUT_CSV and OUTPUT_MD are specified in the config!")
 
     # Get the arguments, excluding filename
     args = sys.argv[1:]
 
+    # Argument count
+    argc = len(args)
+
     # At least one argument
-    if len(args) > 0:
+    if argc > 0:
+
         # Loop over arguments
         for arg in args:
+
             # Get file name
             filename = os.path.basename(arg)
 
@@ -92,28 +104,101 @@ if __name__ == '__main__':
                             else:
                                 print(f"Info: {label} does not have field type '{field_type}'.")
 
-                print("Finished processing maps. Generating report ...")
+                print("Finished processing maps. Generating reports ...")
 
-                # File content, will be joined later
-                content = ["Species,Encounters,Routes"]
+                # Get the output directory from the config
+                outdir = CONFIG.OUTPUT_DIRECTORY
 
-                # Loop over all of the species in the table
-                for table_species in table.keys():
-                    # Add the species data to the content array
-                    content.append(f"{table_species},{len(table[table_species])},{'|'.join(table[table_species])}")
+                # Source folder is specified
+                if outdir == 'source_folder':
+                    # Set outdir to input folder
+                    outdir = folder
+                else: # Other folder specified
 
-                # Generate the completed report
-                output = '\n'.join(content)
+                    # Ensure no report overlapping occurs
 
-                # Generate encounter report csv filename
-                report = os.path.join(folder, "encounter-report.csv")
+                    # More than one argument
+                    if argc > 0:
+                        print(f"Warning: Multiple arguments, reports will be placed in {folder} ...")
+                        # Set outdir to input folder
+                        outdir = folder
 
-                print(f"Report finished. Writing to file {report} ...")
+                    else: # Just one argument
+                        # Ensure directory exists
+                        os.makedirs(outdir, exist_ok=True)
 
-                # Open the report file
-                with open(report, "w") as r:
-                    # Write the report to the file
-                    r.write(output)
+                # Get csv filename from config
+                csv = CONFIG.OUTPUT_CSV
+
+                # Csv not set to none
+                if csv != None:
+
+                    print(f"Generating csv report ...")
+
+                    # File content, will be joined later
+                    content = ["Species,Encounters,Routes"]
+
+                    # Loop over all of the species in the table
+                    for table_species in table.keys():
+                        # Add the species data to the content array
+                        content.append(f"{table_species},{len(table[table_species])},{'|'.join(table[table_species])}")
+
+                    # Generate the completed report
+                    output = '\n'.join(content)
+
+                    # Build encounter report filename
+                    report = os.path.join(outdir, csv)
+
+                    print(f"Writing csv report to file {report} ...")
+
+                    # Open the report file
+                    with open(report, "w") as r:
+                        # Write the report to the file
+                        r.write(output)
+
+                # Get markdown filename from config
+                md = CONFIG.OUTPUT_MD
+
+                # Markdown not set to none
+                if md != None:
+
+                    print(f"Generating markdown report ...")
+
+                    # File content, will be joined later
+                    content = [
+                        "| Species | Encounters | Routes |", 
+                        "| ------- | ---------- | ------ |"
+                    ]
+
+                    # Loop over all of the species in the table
+                    for table_species in table.keys():
+
+                        # Get the number of encounters
+                        num_encounters = len(table[table_species])
+
+                        # Get the list of encounters
+                        encounter_list = ', '.join(table[table_species])
+
+                        # At least one encounter
+                        if num_encounters == 0:
+                            # Set encounter list to 'None'
+                            encounter_list = 'None'
+
+                        # Add the species data to the content array
+                        content.append(f"| {table_species} | {num_encounters} | {encounter_list} |")
+
+                    # Generate the completed report
+                    output = '\n'.join(content)
+
+                    # Build encounter report filename
+                    report = os.path.join(outdir, md)
+
+                    print(f"Writing markdown report to file {report} ...")
+
+                    # Open the report file
+                    with open(report, "w") as r:
+                        # Write the report to the file
+                        r.write(output)
 
                 print(f"Done. Processing file '{filename}' completed.")
 
